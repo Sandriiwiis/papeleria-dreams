@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center py-5 mb-4" style="background-color: #fffafb; border-radius: 20px;">
+    <h1 class="display-4 fw-bold" style="color: #b5838d;">🌸 Papelería Dreams 🌸</h1>
+    <p class="lead text-muted">Insumos bonitos para gente creativa</p>
+    {% if not user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn btn-pastel-primary btn-lg mt-3 shadow-sm">
+            ¡Únete al Club de Descuentos!
+        </a>
+    {% endif %}
+</div>
+
+<div class="row">
+    <h2 class="text-center mb-4" style="color: #6d6875;">Nuestros Favoritos</h2>
+    
+    {% for p in productos %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0 transition-hover">
+            <div class="card-header text-center py-4" style="background-color: {{ p.color }}; border: none;">
+                <span style="font-size: 4rem;">{{ p.imagen }}</span>
+            </div>
+            
+            <div class="card-body text-center">
+                <h5 class="card-title fw-bold" style="color: #555;">{{ p.nombre }}</h5>
+                <p class="card-text small text-muted">{{ p.desc }}</p>
+                <h4 class="text-success fw-bold">${{ p.precio }}</h4>
+            </div>
+            
+            <div class="card-footer bg-white border-0 pb-4 text-center">
+    {% if user.is_authenticated %}
+        <a href="{% url 'agregar_carrito' p.id %}" class="btn btn-outline-secondary w-75 rounded-pill shadow-sm">
+            🛍️ Agregar (+1)
+        </a>
+    {% else %}
+        <a href="{% url 'login' %}" class="btn btn-light w-75 rounded-pill text-muted border">
+            🔒 Logueate para comprar
+        </a>
+    {% endif %}
+</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        transition: transform 0.3s ease;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}

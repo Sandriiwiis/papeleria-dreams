@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm p-4" style="background-color: #fff;">
+            <h2 class="text-center mb-4 fw-bold" style="color: #b5838d;">🛒 Tu Carrito de Compras</h2>
+
+            {% if productos %}
+                <div class="table-responsive">
+                    <table class="table table-borderless align-middle">
+                        <thead style="border-bottom: 2px solid #ffe5ec;">
+                            <tr class="text-muted text-uppercase small">
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th class="text-end">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in productos %}
+                            <tr style="border-bottom: 1px solid #f8f9fa;">
+                                <td class="py-3">
+                                    <span class="fs-4 me-2">{{ p.imagen }}</span>
+                                    <span class="fw-bold text-secondary">{{ p.nombre }}</span>
+                                </td>
+                                <td class="fw-bold" style="color: #6b9080;">${{ p.precio }}</td>
+                                <td class="text-end">
+                                    <small class="text-muted">Eliminar ❌</small>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card mt-4 border-0 p-4" style="background-color: #fffafb; border-radius: 20px;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0 text-muted">Total a Pagar:</h4>
+                        <h2 class="mb-0 fw-bold" style="color: #e5989b;">${{ total }}</h2>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-lg btn-pastel-primary shadow-sm fw-bold rounded-pill text-white" 
+                                style="background-color: #ffb4a2;">
+                            💳 Pagar Ahora
+                        </button>
+                        <a href="{% url 'limpiar_carrito' %}" class="btn btn-link text-muted text-decoration-none">
+                            Vaciar carrito y empezar de cero
+                        </a>
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="fs-1 mb-3">🍃</div>
+                    <h4 class="text-muted">Tu carrito está vacío</h4>
+                    <p class="mb-4">¡Nuestra papelería te espera!</p>
+                    <a href="{% url 'landing' %}" class="btn btn-outline-secondary rounded-pill px-4">Ir a la Tienda</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

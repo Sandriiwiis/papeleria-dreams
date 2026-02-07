@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 text-center">
+        <div style="font-size: 4rem;">🔒</div>
+        
+        <h1 class="display-5 mt-3" style="color: #6d6875;">Zona Restringida</h1>
+        
+        <div class="card mt-4 border-0 shadow-sm" style="background-color: #e5989b; color: white;">
+            <div class="card-body">
+                <p class="lead mb-0">
+                    Lo sentimos, no tienes los permisos necesarios para ver esta sección.
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+                &larr; Volver al Inicio
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

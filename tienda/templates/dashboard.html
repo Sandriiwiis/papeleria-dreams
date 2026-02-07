@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card border-0 shadow-sm text-center p-4 h-100" style="background-color: #fffafb;">
+            <div class="mb-3 animate-float">
+                <span style="font-size: 5rem; background-color: #ffe5ec; padding: 20px; border-radius: 50%;">👩‍🎨</span>
+            </div>
+            
+            <h4 class="fw-bold mt-3" style="color: #b5838d;">{{ user.username|title }}</h4>
+            <p class="text-muted small">{{ user.email|default:"usuario@dreams.com" }}</p>
+            
+            <hr style="border-color: #ffcfdf;">
+
+            <div class="d-grid gap-2 mt-4">
+                <a href="{% url 'landing' %}" class="btn btn-pastel-primary rounded-pill fw-bold">
+                    🛍️ Ir a la Tienda
+                </a>
+                </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        
+        <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="background-color: #cdb4db;">
+            <div class="card-body p-5 text-white position-relative">
+                <h2 class="fw-bold">¡Hola, {{ user.username }}! ☁️</h2>
+                <p class="lead mb-0">Bienvenida a tu espacio personal.</p>
+                <span style="position: absolute; right: 20px; bottom: -10px; font-size: 6rem; opacity: 0.3;">🌸</span>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm p-3 text-center h-100" style="background-color: #eaf4f4;">
+                    <h3 class="fw-bold" style="color: #6b9080;">
+                        {{ request.session.carrito|length|default:"0" }}
+                    </h3>
+                    <small class="text-muted">Productos en tu Carrito 🛒</small>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm p-3 text-center h-100" style="background-color: #fff1e6;">
+                    <h3 class="fw-bold" style="color: #cb997e;">
+                        {{ user.date_joined|date:"Y" }}
+                    </h3>
+                    <small class="text-muted">Miembro desde (Año)</small>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="mb-3 fw-bold" style="color: #6d6875;">⚡ Gestión de Carrito</h5>
+        <div class="card border-0 shadow-sm p-4">
+            <div class="row text-center">
+                <div class="col-md-6 mb-2">
+                    <a href="{% url 'ver_carrito' %}" class="btn btn-outline-secondary w-100 py-3 rounded-3 border-2">
+                        📋 Ver Detalle y Pagar
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="{% url 'limpiar_carrito' %}" class="btn btn-outline-danger w-100 py-3 rounded-3 border-2">
+                        🗑️ Vaciar Todo
+                    </a>
+                </div>
+            </div>
+            <p class="text-center text-muted small mt-3 mb-0">
+                Acciones directas para manejar tus compras sin complicaciones.
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .animate-float {
+        animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+</style>
+{% endblock %}
