@@ -5,21 +5,17 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.views.generic import TemplateView
+import urllib.parse # Importación movida arriba para mantener el orden
 
-# IMPORTANTE: Importamos el modelo que acabamos de crear
-from .models import Producto 
+# Importamos los modelos de productos y los nuevos modelos de pedidos
+from .models import Producto, Pedido, DetallePedido
 
 def landing(request):
-    # Ya no escribimos la lista a mano.
-    # Esta línea mágica trae TODOS los productos que creaste en el admin:
     productos = Producto.objects.all()
-    
     context = {'productos': productos}
     return render(request, 'landing.html', context)
 
-# ... (El resto de tus vistas register, dashboard, etc. déjalas igual) ...
 def register(request):
-    # ... tu código sigue igual ...
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -46,78 +42,72 @@ class VistaPermisoMixinView(PermissionRequiredMixin, TemplateView):
     template_name = "permiso.html"
 
 def agregar_carrito(request, producto_id):
-    # 1. Obtenemos el "carrito" de la sesión (o creamos una lista vacía si no existe)
     carrito = request.session.get('carrito', [])
-    
-    # 2. Agregamos el ID del producto que el usuario eligió
     carrito.append(producto_id)
-    
-    # 3. Guardamos los cambios en la sesión
     request.session['carrito'] = carrito
-    
-    # 4. Volvemos a la tienda
     return redirect('landing')
 
 def limpiar_carrito(request):
-    # Borra la memoria del carrito
     request.session['carrito'] = []
     return redirect('landing')
 
 def ver_carrito(request):
-    # 1. Recuperamos la lista de IDs de la sesión
     carrito_ids = request.session.get('carrito', [])
-    
-    # 2. Buscamos los productos reales en la base de datos
     productos_en_carrito = []
     total = 0
     
     for producto_id in carrito_ids:
-        # Buscamos cada producto por su ID
         producto = Producto.objects.filter(id=producto_id).first()
         if producto:
             productos_en_carrito.append(producto)
             total += producto.precio
             
-    # 3. Enviamos todo al template
     return render(request, 'carrito.html', {
         'productos': productos_en_carrito, 
         'total': total
     })
 
-import urllib.parse
-from django.shortcuts import redirect
-
-import urllib.parse
-from django.shortcuts import redirect
-
+# Decorador agregado: ¡Solo los usuarios logueados pueden comprar!
+@login_required(login_url='login')
 def procesar_pago_whatsapp(request):
-    # 1. Recuperamos los IDs del carrito exactamente igual que en 'ver_carrito'
     carrito_ids = request.session.get('carrito', [])
     
-    # 2. Definir tu número de teléfono (¡No olvides cambiar este número por el tuyo!)
+    # Si por algún motivo el carrito está vacío, devolvemos al usuario a la tienda
+    if not carrito_ids:
+        return redirect('landing')
+        
+    # 1. Crear el Pedido general en la base de datos vinculado al usuario actual
+    nuevo_pedido = Pedido.objects.create(usuario=request.user, total=0)
+    
     telefono = "56912345678" 
-    
-    # 3. Empezamos a armar el mensaje inicial
     mensaje = "¡Hola Papelería Dreams! 💖 Me encantaría concretar el pago de este pedido:\n\n"
-    total = 0
+    total_calculado = 0
     
-    # 4. Buscamos los productos en la base de datos y los sumamos al texto
+    # 2. Buscar productos, guardar el detalle en la BD y armar el mensaje
     for producto_id in carrito_ids:
         producto = Producto.objects.filter(id=producto_id).first()
         if producto:
-            # Agregamos el nombre y el precio de cada producto al mensaje
+            # Creamos el detalle específico para este pedido
+            DetallePedido.objects.create(
+                pedido=nuevo_pedido,
+                producto=producto,
+                precio=producto.precio,
+                cantidad=1
+            )
             mensaje += f"✨ {producto.nombre} - ${producto.precio}\n"
-            total += producto.precio
+            total_calculado += producto.precio
             
-    # Agregamos el total al final del mensaje
-    mensaje += f"\nTotal a pagar: ${total}\n¡Muchas gracias!"
+    # 3. Actualizamos el precio final en el registro del pedido
+    nuevo_pedido.total = total_calculado
+    nuevo_pedido.save()
     
-    # 5. Codificamos el texto para que los espacios y saltos de línea funcionen en la URL
+    # 4. Finalizamos el mensaje para WhatsApp
+    mensaje += f"\nTotal a pagar: ${total_calculado}\n¡Muchas gracias!"
     mensaje_codificado = urllib.parse.quote(mensaje)
     whatsapp_url = f"https://wa.me/{telefono}?text={mensaje_codificado}"
     
-    # 6. (Opcional pero recomendado) Vaciamos el carrito porque el usuario ya fue a pagar
+    # 5. Vaciamos el carrito de la sesión
     request.session['carrito'] = []
     
-    # 7. ¡Redirigir a WhatsApp!
+    # 6. Redirigimos a WhatsApp
     return redirect(whatsapp_url)

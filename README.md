@@ -1,49 +1,62 @@
-# 🌸 Papelería Dreams - Proyecto Django
+# 🌸 Papelería Dreams - Proyecto Django E-commerce
 
 **Autor:** Sandra
-**Curso:** Fullstack Python - Módulo 6
-**Fecha:** Febrero 2026
+**Curso:** Fullstack Python - Módulo 8 (Entrega Final de Portafolio)
+**Fecha:** Marzo 2026
+**Enlace al Repositorio:** [https://github.com/Sandriiwiis/papeleria-dreams](https://github.com/Sandriiwiis/papeleria-dreams)
 
 ---
 
 ## 📝 Descripción del Proyecto
-Este proyecto consiste en el desarrollo de una aplicación web para una tienda de papelería ("Papelería Dreams"). La aplicación implementa el patrón de arquitectura **MVT (Modelo-Vista-Plantilla)** de Django, permitiendo a los usuarios navegar por un catálogo de productos, registrarse, iniciar sesión y gestionar un carrito de compras dinámico.
+Este proyecto consiste en el desarrollo de una aplicación web (E-commerce MVP) para una tienda de papelería ("Papelería Dreams"). La aplicación implementa el patrón de arquitectura **MVT (Modelo-Vista-Plantilla)** de Django, integrando todo lo aprendido a lo largo del bootcamp. 
 
-El objetivo principal fue integrar la autenticación de usuarios con el manejo de datos persistentes (Base de Datos SQLite) y temporales (Sesiones de Django).
+El flujo principal permite a los usuarios navegar por un catálogo dinámico, gestionar un carrito de compras y registrar sus pedidos en la base de datos, culminando en una redirección directa a WhatsApp para una atención personalizada.
 
 ---
 
 ## ✨ Funcionalidades Implementadas
 
-1.  **Autenticación de Usuarios:**
-    * Sistema de Registro (`UserCreationForm`).
-    * Inicio de Sesión (Login) y Cierre de Sesión (Logout).
-    * Protección de rutas: El Dashboard y el Carrito son exclusivos para usuarios logueados.
+1.  **Autenticación y Roles:**
+    * Sistema de Registro, Login y Logout.
+    * Roles definidos: **Cliente** (acceso a compras) y **Administrador** (gestión de catálogo).
+    * Protección de rutas mediante decoradores (`@login_required`).
 
-2.  **Gestión de Productos (Administrador):**
-    * Modelo `Producto` creado en base de datos.
-    * Panel de Administración (`/admin`) habilitado para crear, editar y eliminar productos.
-    * Carga dinámica de productos en la página de inicio (Landing Page).
+2.  **Catálogo y Persistencia (Base de Datos):**
+    * Modelos en SQLite3 gestionados a través del ORM de Django.
+    * Panel de Administración (`/admin`) para operaciones CRUD sobre los productos.
 
-3.  **Carrito de Compras (Lógica de Negocio):**
-    * Implementación de **Sessions** para mantener el estado del carrito.
-    * Funciones para `agregar`, `ver` y `vaciar` el carrito.
-    * Cálculo automático del total a pagar.
+3.  **Carrito y Flujo de Compra (Lógica de Negocio):**
+    * Uso de **Sesiones** temporales (`request.session`) para agregar, ver y vaciar productos del carrito.
+    * **Confirmación de compra:** Al proceder al pago, el sistema genera automáticamente un `Pedido` y su `DetallePedido` en la base de datos, asociándolos al usuario autenticado.
+    * Integración dinámica con la API de **WhatsApp** (`wa.me`) para concretar el pago y mejorar la experiencia del cliente.
 
-4.  **Interfaz de Usuario (Frontend):**
+4.  **Interfaz de Usuario (UX/UI):**
     * Diseño responsivo utilizando **Bootstrap 5**.
     * Estilización personalizada (CSS) con temática "Pastel/Cute".
-    * Uso de herencia de plantillas (`base.html`) para mantener la consistencia visual.
+    * Mensajes de éxito/error y validaciones para guiar al usuario.
 
 ---
 
-## 🧠 Reflexión del Desarrollador
+## 🗺️ Rutas Principales
 
-Durante el desarrollo de este proyecto, profundicé en la comprensión de cómo Django maneja las peticiones HTTP y la importancia del archivo `urls.py` para el enrutamiento correcto.
+* `/` : Catálogo de productos (Landing Page).
+* `/login/` y `/register/` : Accesos de usuario.
+* `/carrito/` : Resumen de la compra y total a pagar.
+* `/pagar-whatsapp/` : Procesamiento del pedido en BD y redirección a WhatsApp.
+* `/admin/` : Panel de administración exclusivo para el staff.
 
-Uno de los mayores desafíos fue la implementación del **Carrito de Compras**. Aprendí que, a diferencia de los productos que residen en la base de datos, el carrito es una estructura temporal que debe gestionarse mediante **Sesiones (`request.session`)**. Esto me permitió entender la diferencia entre datos persistentes y datos de sesión.
+---
 
-También me enfrenté a errores comunes como `TemplateDoesNotExist` o problemas de importación en las vistas, lo cual reforzó mi habilidad para depurar código leyendo los mensajes de error de la consola. Finalmente, logré integrar el Frontend (Bootstrap) con el Backend, asegurando que los botones (que inicialmente eran estáticos) ejecutaran acciones reales en el servidor.
+## 🔑 Credenciales de Prueba
+
+Para evaluar el funcionamiento integral de la plataforma, se han creado las siguientes cuentas de prueba:
+
+* **Administrador (Staff):**
+  * Usuario: `Sandra` 
+  * Contraseña: `Admin1234`
+* **Cliente (Usuario regular):**
+  * Usuario: `Cereza` 
+  * Contraseña: `Cere1234` 
 
 ---
 
@@ -53,17 +66,17 @@ También me enfrenté a errores comunes como `TemplateDoesNotExist` o problemas 
 * **Framework:** Django 6.0
 * **Base de Datos:** SQLite3
 * **Frontend:** HTML5, CSS3, Bootstrap 5.3
-* **Control de Versiones:** Git
+* **Control de Versiones:** Git / GitHub
 
 ---
 
-## ⚙️ Instrucciones de Ejecución
+## ⚙️ Instrucciones de Instalación y Ejecución
 
 Si desea correr este proyecto localmente:
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone https://github.com/Sandriiwiis/papeleria-dreams
+    git clone [https://github.com/Sandriiwiis/papeleria-dreams](https://github.com/Sandriiwiis/papeleria-dreams)
     ```
 
 2.  **Activar entorno virtual:**
@@ -77,17 +90,13 @@ Si desea correr este proyecto localmente:
     pip install django
     ```
 
-4.  **Ejecutar migraciones:**
+4.  **Ejecutar migraciones (para inicializar los modelos de Productos y Pedidos):**
     ```bash
+    python manage.py makemigrations
     python manage.py migrate
     ```
 
-5.  **Crear superusuario (opcional):**
-    ```bash
-    python manage.py createsuperuser
-    ```
-
-6.  **Iniciar servidor:**
+5.  **Iniciar servidor local:**
     ```bash
     python manage.py runserver
     ```
