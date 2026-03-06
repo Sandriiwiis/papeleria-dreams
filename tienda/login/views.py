@@ -83,3 +83,41 @@ def ver_carrito(request):
         'productos': productos_en_carrito, 
         'total': total
     })
+
+import urllib.parse
+from django.shortcuts import redirect
+
+import urllib.parse
+from django.shortcuts import redirect
+
+def procesar_pago_whatsapp(request):
+    # 1. Recuperamos los IDs del carrito exactamente igual que en 'ver_carrito'
+    carrito_ids = request.session.get('carrito', [])
+    
+    # 2. Definir tu número de teléfono (¡No olvides cambiar este número por el tuyo!)
+    telefono = "56912345678" 
+    
+    # 3. Empezamos a armar el mensaje inicial
+    mensaje = "¡Hola Papelería Dreams! 💖 Me encantaría concretar el pago de este pedido:\n\n"
+    total = 0
+    
+    # 4. Buscamos los productos en la base de datos y los sumamos al texto
+    for producto_id in carrito_ids:
+        producto = Producto.objects.filter(id=producto_id).first()
+        if producto:
+            # Agregamos el nombre y el precio de cada producto al mensaje
+            mensaje += f"✨ {producto.nombre} - ${producto.precio}\n"
+            total += producto.precio
+            
+    # Agregamos el total al final del mensaje
+    mensaje += f"\nTotal a pagar: ${total}\n¡Muchas gracias!"
+    
+    # 5. Codificamos el texto para que los espacios y saltos de línea funcionen en la URL
+    mensaje_codificado = urllib.parse.quote(mensaje)
+    whatsapp_url = f"https://wa.me/{telefono}?text={mensaje_codificado}"
+    
+    # 6. (Opcional pero recomendado) Vaciamos el carrito porque el usuario ya fue a pagar
+    request.session['carrito'] = []
+    
+    # 7. ¡Redirigir a WhatsApp!
+    return redirect(whatsapp_url)

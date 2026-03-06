@@ -1,7 +1,8 @@
 from django.urls import path
 from django.contrib.auth import views as login_views
 from django.views.generic import RedirectView
-# AQUÍ ESTABA EL ERROR: Faltaba importar ver_carrito 👇
+
+# Importamos todas las vistas, incluyendo la de WhatsApp 👇
 from .views import (
     landing,
     register,
@@ -11,7 +12,8 @@ from .views import (
     VistaPermisoMixinView,
     agregar_carrito,
     limpiar_carrito,
-    ver_carrito    # <--- ¡AHORA SÍ ESTÁ INVITADO!
+    ver_carrito,
+    procesar_pago_whatsapp  # <--- ¡La agregamos aquí!
 )
 
 urlpatterns = [
@@ -29,6 +31,9 @@ urlpatterns = [
     path('agregar/<int:producto_id>/', agregar_carrito, name='agregar_carrito'),
     path('limpiar/', limpiar_carrito, name='limpiar_carrito'),
     path('carrito/', ver_carrito, name='ver_carrito'),
+    
+    # ✨ Ruta de WhatsApp (¡Debe ir antes del RedirectView!)
+    path('pagar-whatsapp/', procesar_pago_whatsapp, name='pagar_whatsapp'),
 
     # Redirect final (Siempre al último)
     path("<path:anything>", RedirectView.as_view(url="/", permanent=False)),
